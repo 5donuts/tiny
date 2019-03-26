@@ -10,11 +10,14 @@ parser: parser.y
 	bison -d parser.y
 
 clean:
-	rm -f *.tab.* *.yy.c out.o
+	rm -f *.tab.* *.yy.c
 
 target: out.s
 	as out.s -o out.o
 	ld -s -o out out.o
 
-noexecs:
+notarget:
+	rm -f out.o out.s
+
+noexec:
 	rm -f tiny out
