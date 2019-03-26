@@ -1,2 +1,2 @@
-# tiny-compiler
+# tiny
 A toy C compiler
