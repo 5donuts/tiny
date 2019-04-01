@@ -1,32 +1,24 @@
 %{
-  #include <stdio.h>
-
-  // function declarations
-  int yylex();
-  void yyerror(char *s);
+  #include "tiny.h"
 %}
 
 %token INCLUDE HEADER_FILE
-%token TYPE IDENTIFIER RETURN INT
+%token TYPE IDENTIFIER RETURN NUMBER
 %token OPEN_BRACE CLOSE_BRACE
 
 %%
 
-program:
-  header function
+program: header function
   | function
   ;
 
-header:
-  INCLUDE HEADER_FILE
+header: INCLUDE HEADER_FILE
   ;
 
-function:
-  TYPE IDENTIFIER '(' ')' OPEN_BRACE expression CLOSE_BRACE
+function: TYPE IDENTIFIER '(' ')' OPEN_BRACE expression CLOSE_BRACE
   ;
 
-expression:
-  RETURN INT ';'
+expression: RETURN NUMBER ';'
   ;
 
 %%

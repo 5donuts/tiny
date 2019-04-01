@@ -1,18 +1,17 @@
-#include <stdio.h>
-#include <string.h>
+#include "tiny.h"
 
 extern FILE *yyin;
 
-int yyparse(void);
-
 int main(int argc, char **argv) {
   ++argv, --argc; // skip over program name
+  // either open file specified by command-line argument
+  // or read from standard input
   if (argc > 0)
     yyin = fopen(argv[0], "r");
   else
     yyin = stdin;
 
-  yyparse();
+  yyparse(); // TODO change this too
 
   // hardcoded assembly
   // TODO change this
@@ -24,7 +23,7 @@ int main(int argc, char **argv) {
   fprintf(out, "\tmovl\t$1, %%eax\n"); // system call number of sys_exit is 1
   fprintf(out, "\tint\t$0x80\n"); // send an interrupt
 
+  // cleanup & exit
   fclose(out);
-
   return 0;
 }

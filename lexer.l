@@ -1,5 +1,5 @@
 %{
-    #include "parser.tab.h" // include parser definitions
+    #include "tiny.h"
 %}
 
 %option noyywrap
@@ -14,7 +14,7 @@
 "("             { return '('; }
 ")"             { return ')'; }
 ";"             { return ';'; }
-[0-9]+          { return INT; }
+[0-9]+          { return NUMBER; }
 "return"        { return RETURN; }
 
 "int"           { return TYPE; }
