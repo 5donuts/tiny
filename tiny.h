@@ -1,3 +1,7 @@
+// header guard
+#ifndef TINY_H
+#define TINY_H
+
 // imports
 #include <stdio.h> // for I/O
 #include <stdlib.h> // malloc/free
@@ -16,3 +20,5 @@ int yylex();
 void yyerror(char *);
 symbol *put_symbol(char *); // add a symbol to the symbol table
 symbol *get_symbol(char *); // get a symbol from the symbol table
+
+#endif // TINY_H
