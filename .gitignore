@@ -52,8 +52,7 @@ Mkfile.old
 dkms.conf
 
 # assembly, flex, bison, & executable files
-*.s
 lex.yy.c
 *.tab.*
 tiny
-out
+out*
