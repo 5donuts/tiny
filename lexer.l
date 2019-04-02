@@ -1,24 +1,37 @@
 %{
-    #include "tiny.h"
+  #include "tiny.h"
 %}
 
 %option noyywrap
 
+/* exclusive start condition for block comments */
+%x BLOCK_COMMENT
+
 %%
 
-"//"[^\n]*  { /* Discard comments */ }
-[ \t\n]+    { /* Ignore whitespace */ }
+"//"[^\n]*          { /* Discard single-line comments */ }
+"/*"                { BEGIN(BLOCK_COMMENT); } /* consume block comments */
+<BLOCK_COMMENT>"*/" { BEGIN(INITIAL); }
+<BLOCK_COMMENT>.    { }
+<BLOCK_COMMENT>\n   { }
+[ \t\n]+            { /* Ignore whitespace */ }
 
-"{"             { return OPEN_BRACE; }
-"}"             { return CLOSE_BRACE; }
+"{"             { return '{'; }
+"}"             { return '}'; }
 "("             { return '('; }
 ")"             { return ')'; }
 ";"             { return ';'; }
-[0-9]+          { return NUMBER; }
+[0-9]+          { yylval.num = atol(yytext);
+                  return NUMBER; }
 "return"        { return RETURN; }
 
-"int"           { return TYPE; }
-"main"          { return IDENTIFIER; }
+"int"           { /* TODO redo these to use symrec pointers instead of str */
+                  /* yylval->str = malloc(strlen(yytext) + 1);
+                  strcpy(yylval->str, yytext); */
+                  return TYPE; }
+"main"          { /* yylval->str = malloc(strlen(yytext) + 1);
+                  strcpy(yylval->str, yytext); */
+                  return IDENTIFIER; }
 
 "#include"      { return INCLUDE; }
 "<"[a-z.]+">"   { return HEADER_FILE; }
