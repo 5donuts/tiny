@@ -35,7 +35,7 @@ expression: RETURN NUMBER ';'   {
                                   /* sprintf(str, "movl\t$%d, %%eax\n", yylval.num); */
                                   /* emit(str); */
                                   /* free(str); */
-                                  fprintf(out, "\tmovl\t$%ld, %%eax\n", yylval.num);
+                                  fprintf(out, "\tmovl\t$%ld, %%ebx\n", yylval.num);
                                 }
   ;
 
