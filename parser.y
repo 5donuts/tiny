@@ -13,30 +13,25 @@
   /* symrec *ptr;       /* for returning symbol-table pointers */
 }
 
-%token INCLUDE HEADER_FILE
 %token TYPE IDENTIFIER RETURN
 %token <num> NUMBER
 
+%type <num> expression statement
+
 %%
 
-program: header function
-  | function
+program: function
   ;
 
-header: INCLUDE HEADER_FILE
+function: TYPE IDENTIFIER '(' ')' '{' statement '}'
   ;
 
-function: TYPE IDENTIFIER '(' ')' '{' expression '}'
+statement: RETURN expression ';'  {
+                                    fprintf(out, "\tmovl\t$%ld, %%ebx\n", $2);
+                                  }
   ;
 
-expression: RETURN NUMBER ';'   {
-                                  /* char *str = (char *) malloc(50); // TODO better way to do this??
-                                  memset(str, '\0', 50); */
-                                  /* sprintf(str, "movl\t$%d, %%eax\n", yylval.num); */
-                                  /* emit(str); */
-                                  /* free(str); */
-                                  fprintf(out, "\tmovl\t$%ld, %%ebx\n", yylval.num);
-                                }
+expression: NUMBER                { $$ = $1; }
   ;
 
 %%

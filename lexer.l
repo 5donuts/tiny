@@ -21,8 +21,10 @@
 "("             { return '('; }
 ")"             { return ')'; }
 ";"             { return ';'; }
+
 [0-9]+          { yylval.num = atol(yytext);
                   return NUMBER; }
+
 "return"        { return RETURN; }
 
 "int"           { /* TODO redo these to use symrec pointers instead of str */
@@ -32,8 +34,5 @@
 "main"          { /* yylval->str = malloc(strlen(yytext) + 1);
                   strcpy(yylval->str, yytext); */
                   return IDENTIFIER; }
-
-"#include"      { return INCLUDE; }
-"<"[a-z.]+">"   { return HEADER_FILE; }
 
 %%
