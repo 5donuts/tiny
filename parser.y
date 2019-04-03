@@ -17,7 +17,7 @@
 %token TYPE IDENTIFIER RETURN
 %token <num> NUMBER
 
-%right '-'
+%right '-' '~' '!'
 
 %%
 
@@ -34,6 +34,8 @@ statement: RETURN expression ';'  {
 
 expression: NUMBER      { $$ = $1; }
   | '-' NUMBER          { $$ = -$2; }
+  | '~' NUMBER          { $$ = ~$2; }
+  | '!' NUMBER          { $$ = !$2; }
   ;
 
 %%

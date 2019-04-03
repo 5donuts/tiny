@@ -22,6 +22,8 @@
 ")"             { return ')'; }
 ";"             { return ';'; }
 "-"             { return '-'; }
+"~"             { return '~'; }
+"!"             { return '!'; }
 
 [0-9]+          { yylval.num = atol(yytext);
                   return NUMBER; }
