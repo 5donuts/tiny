@@ -12,11 +12,12 @@
   long num;          /* constant integer value */
   /* symrec *ptr;       /* for returning symbol-table pointers */
 }
+%type <num> expression statement
 
 %token TYPE IDENTIFIER RETURN
 %token <num> NUMBER
 
-%type <num> expression statement
+%right '-'
 
 %%
 
@@ -31,7 +32,8 @@ statement: RETURN expression ';'  {
                                   }
   ;
 
-expression: NUMBER                { $$ = $1; }
+expression: NUMBER      { $$ = $1; }
+  | '-' NUMBER          { $$ = -$2; }
   ;
 
 %%
