@@ -24,7 +24,6 @@ typedef struct symrec {
 // common function declarations
 int yylex();
 void yyerror(char *);
-void emit(char *); // emit a string of symbols
 symrec *put_symbol(char *); // add a symbol to the symbol table
 symrec *get_symbol(char *); // get a symbol from the symbol table
 

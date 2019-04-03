@@ -37,11 +37,6 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-// emit a string of symbols to the output file
-void emit(char *str) {
-  fprintf(out, str);
-}
-
 // add a symbol to the symbol table
 // NB: the symbol table is LIFO
 symrec *put_symbol(char *name) {
