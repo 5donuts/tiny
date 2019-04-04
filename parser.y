@@ -16,8 +16,7 @@
  * and: https://stackoverflow.com/a/12549501/3646065
  */
 %union {
-  long num;          /* constant integer value */
-  /* symrec *ptr;       /* for returning symbol-table pointers */
+  long num;          /* constant integer value TODO add more */
 }
 %type <num> expression statement
 
