@@ -1,7 +1,11 @@
 %{
-  #include "tiny.h"
+  #include <stdlib.h> // atol, malloc, free, etc.
+  #include "parser.tab.h" // parser token definitions
+
+  void yyerror(char *);
 %}
 
+%option yylineno
 %option noyywrap
 
 /* exclusive start condition for block comments */

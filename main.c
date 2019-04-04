@@ -1,8 +1,17 @@
-#include "tiny.h"
+#include <stdio.h>
+#include <stdlib.h> // malloc, free, etc.
+#include <string.h> // memcpy, strcmp, etc.
 
-extern FILE *yyin;
+#include "symtab.h" // symbol table definitions & function declarations
+#include "codegen.h" // code generation definitions & function declarations
 
-// initalize the symbol table
+extern FILE *yyin; // defined by lexer
+
+int yylex(void); // defined by lexer
+int yyparse(void); // defined by parser
+void yyerror(char *); // defined in parser.y
+
+// the symbol table
 symrec *symtab = NULL;
 
 // output file
@@ -25,12 +34,7 @@ int main(int argc, char **argv) {
   fprintf(out, "\t.global _start\n\n");
   fprintf(out, "_start:\n");
 
-  // fprintf(out, "\tmovl\t$0, %%ebx\n"); // argument to system call
-  yyparse(); // should emit the assembly for the return statement (prev. line)
-
-  // write more boilerplate assembly to finish
-  fprintf(out, "\tmovl\t$1, %%eax\n"); // system call number of sys_exit is 1
-  fprintf(out, "\tint\t$0x80\n"); // send an interrupt
+  yyparse(); // TODO work on parsing & stuff
 
   // cleanup & exit
   fclose(out);
@@ -39,7 +43,7 @@ int main(int argc, char **argv) {
 
 // add a symbol to the symbol table
 // NB: the symbol table is LIFO
-symrec *put_symbol(char *name) {
+symrec *putsym(char *name) {
   // build the new symbol struct
   symrec *sym = (symrec *) malloc(sizeof(symrec));
   sym->name = (char *) malloc(strlen(name) + 1);
@@ -55,11 +59,28 @@ symrec *put_symbol(char *name) {
 
 // perform a linear search for a symbol with the given name
 // NB: returns either the symbol or NULL
-symrec *get_symbol(char *name) {
+symrec *getsym(char *name) {
   symrec *sym;
   for (sym = symtab; sym != NULL; sym = (symrec *) sym->next) {
     if (strcmp(sym->name, name) == 0)
       return sym;
   }
   return NULL;
+}
+
+// generate assembly code for system calls
+void make_syscall(syscall *call) {
+  // perform per-call operations
+  int *exit_code;
+  switch (call->code) {
+    case SYS_EXIT:
+      exit_code = call->arg1;
+      fprintf(out, "\tmovl\t$%d, %%ebx\n", *exit_code);
+      break;
+    default:
+      fprintf(stderr, "Error, syscall code %x unrecognized\n", call->code);
+      exit(1);
+  }
+  // make the syscall
+  fprintf(out, "\tmovl\t$%x, %%eax\n\tint\t$0x80\n", call->code);
 }
