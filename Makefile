@@ -14,7 +14,7 @@ target: out.s
 	ld -s -o out out.o
 
 rmall: clean notarget noexec
-	
+
 clean:
 	rm -f *.tab.* *.yy.c
 
@@ -23,3 +23,5 @@ notarget:
 
 noexec:
 	rm -f tiny out
+
+gone: clean notarget noexec
