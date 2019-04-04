@@ -11,9 +11,6 @@ int yylex(void); // defined by lexer
 int yyparse(void); // defined by parser
 void yyerror(char *); // defined in parser.y
 
-// the symbol table
-symrec *symtab = NULL;
-
 // output file
 FILE *out;
 

@@ -11,6 +11,9 @@ typedef struct symrec {
   struct symrec *next; // next item in the linked list
 } symrec;
 
+// the symbol table
+symrec *symtab = NULL;
+
 // function declarations
 // NB: functions are defined in main.c
 symrec *putsym(char *); // add a symbol to the symbol table

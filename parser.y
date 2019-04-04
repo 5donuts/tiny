@@ -27,25 +27,41 @@
 
 %%
 
-program: function
+program:
+  function
   ;
 
-function: TYPE IDENTIFIER '(' ')' '{' statement '}'
+function:
+  TYPE IDENTIFIER '(' ')' '{' statement_list '}'
   ;
 
-statement: RETURN expression ';'  { // TODO change this to work for things besides main()
-                                    int exit_code = $2;
-                                    syscall call;
-                                    call.code = SYS_EXIT;
-                                    call.arg1 = &exit_code;
-                                    make_syscall(&call);
-                                  }
+statement_list:
+  statement_list statement
+  | statement
+  | /* empty */
   ;
 
-expression: NUMBER      { $$ = $1; }
-  | '-' NUMBER          { $$ = -$2; } /* TODO change these to produce the relevant assembly instructions instead */
-  | '~' NUMBER          { $$ = ~$2; }
-  | '!' NUMBER          { $$ = !$2; }
+statement:
+  RETURN expression ';'  { // TODO change this
+                           int exit_code = $2;
+                           syscall call;
+                           call.code = SYS_EXIT;
+                           call.arg1 = &exit_code;
+                           make_syscall(&call);
+                         }
+  ;
+
+expression:
+  unary_op expression   { // TODO add expressions to AST & evaluate them??
+                          // TODO figure this out
+                        }
+  | NUMBER              { $$ = $1; }
+  ;
+
+unary_op:
+  '!'
+  | '~'
+  | '-'
   ;
 
 %%
