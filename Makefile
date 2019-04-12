@@ -1,7 +1,7 @@
 All: tiny
 
 tiny: main.c lexer parser
-	gcc lex.yy.c parser.tab.c main.c -o tiny -Wall
+	gcc lex.yy.c parser.tab.c symtab.c codegen.c main.c -o tiny -Wall
 
 lexer: lexer.l
 	flex lexer.l
