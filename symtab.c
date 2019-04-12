@@ -1,6 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "symtab.h"
+
+// the symbol table
+symrec *symtab = NULL;
+
 // add a symbol to the symbol table
 // NB: the symbol table is LIFO
 symrec *putsym(char *name) {
