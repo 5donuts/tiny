@@ -14,8 +14,7 @@ typedef struct symrec {
 // the symbol table
 symrec *symtab = NULL;
 
-// function declarations
-// NB: functions are defined in main.c
+// function prototypes
 symrec *putsym(char *); // add a symbol to the symbol table
 symrec *getsym(char *); // retrieve a symbol from the symbol table
 
