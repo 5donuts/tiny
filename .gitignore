@@ -56,3 +56,4 @@ lex.yy.c
 *.tab.*
 tiny
 out*
+*.output
