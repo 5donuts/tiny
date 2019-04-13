@@ -9,4 +9,4 @@ $(TARGETS):
 	ld -s $@.o -o $@.out
 
 clean:
-	rm -f $(TARGETS) $(TARGETS).o $(TARGETS).out
+	rm -f $(TARGETS).o $(TARGETS).out
