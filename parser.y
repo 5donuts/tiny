@@ -36,19 +36,19 @@ function:
   ;
 
 statement_list:
-  statement_list statement
-  | statement
+  statement_list ';' statement ';'
+  | statement ';'
   | /* empty */
   ;
 
 statement:
-  RETURN expression ';'  { // TODO change this
-                           int exit_code = $2;
-                           syscall call;
-                           call.code = SYS_EXIT;
-                           call.arg1 = &exit_code;
-                           make_syscall(&call);
-                         }
+  RETURN expression     { // TODO change this
+                          int exit_code = $2;
+                          syscall call;
+                          call.code = SYS_EXIT;
+                          call.arg1 = &exit_code;
+                          make_syscall(&call);
+                        }
   ;
 
 expression:
