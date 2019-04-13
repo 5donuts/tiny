@@ -7,11 +7,11 @@ lexer: lexer.l
 	flex lexer.l
 
 parser: parser.y
-	bison -d parser.y
+	bison -d -v parser.y
 
 target: out.s
 	as out.s -o out.o
 	ld -s -o out out.o
 
 clean:
-	rm -f *.tab.* *.yy.c tiny out*
+	rm -f *.tab.* *.yy.c tiny out* parser.output
