@@ -13,15 +13,5 @@ target: out.s
 	as out.s -o out.o
 	ld -s -o out out.o
 
-rmall: clean notarget noexec
-
 clean:
-	rm -f *.tab.* *.yy.c
-
-notarget:
-	rm -f out.o out.s
-
-noexec:
-	rm -f tiny out
-
-gone: clean notarget noexec
+	rm -f *.tab.* *.yy.c tiny out*
