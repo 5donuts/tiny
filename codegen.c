@@ -7,12 +7,10 @@ extern FILE *out; // the output file (see main.c)
 
 // generate assembly code for system calls
 void make_syscall(syscall *call) {
-  // perform per-call operations
-  int *exit_code;
+  // put arguments in appropriate registers depending on the syscall
   switch (call->code) {
     case SYS_EXIT:
-      exit_code = call->arg1;
-      fprintf(out, "\tmovl\t$%d, %%ebx\n", *exit_code);
+      fprintf(out, "\tmovl\t$%d, %%ebx\n", *((int *) call->arg1));
       break;
     default:
       fprintf(stderr, "Error, syscall code %x unrecognized\n", call->code);
