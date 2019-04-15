@@ -1,4 +1,4 @@
-TARGETS = ret_one
+TARGETS = ret_one ret_one_sym
 
 LINKER_FLAGS = -s
 
