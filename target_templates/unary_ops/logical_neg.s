@@ -3,6 +3,6 @@
 
 _start:
   movl  $1, %eax
-  movl  $1, %ebx
-  xor   $1, %ebx  # equivalent to Logical NOT (0 is false, 1 is true)
+  movl  $1, %ebx  # the value to take the logical NOT of
+  xor   $1, %ebx  # NB: this is only valid for 0x01 and 0x00 values
   int   $0x80
