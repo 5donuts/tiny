@@ -57,3 +57,5 @@ lex.yy.c
 tiny
 out*
 *.output
+test_programs/
+target_templates
