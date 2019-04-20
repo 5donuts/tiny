@@ -28,7 +28,7 @@ For example:
 ```
 ./tiny
 int main() {
-  exit(0);
+  exit(2);
 }
 ```
 will produce the following assembly in `out.s`:
