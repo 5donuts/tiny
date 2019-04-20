@@ -2,26 +2,21 @@
 A toy C compiler
 
 # Building Tiny
-Tiny can be compiled using `make` (assuming you have `flex` and `bison` installed), or manually as follows:
+Build Tiny using `make`, or with the following commands:
 
-    bison -d parser.y
     flex lexer.l
-    gcc lex.yy.c parser.tab.c main.c -o tiny
+    bison -d parser.y
+    gcc lex.yy.c parser.tab.c symtab.c ast.c main.c -o tiny -Wall
 
 # Usage
-C programs that Tiny is able compile can be produced using `make` as follows:
+You can use Tiny to produce executables using `make` as follows:
 
-    ./tiny <program>
+    ./tiny /path/to/prog.c
     make target
+
 Note that if you use the `make` method, your executable will be called `out`.
 Alternatively, you can manually produce programs using Tiny as follows:
 
-    ./tiny <program>
+    ./tiny /path/to/prog.c
     as out.s -o out.o
     ld -s -o <executable_name> out.o
-# Supported C Features
-Currently, Tiny supports the following operations:
-
-* Unary negation (`-`)
-* Logical negation (`!`)
-* Bitwise complement (`~`)
