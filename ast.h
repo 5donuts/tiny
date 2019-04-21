@@ -1,5 +1,4 @@
-#ifndef AST_H
-#define AST_H
+#pragma once
 
 #include "symtab.h"
 
@@ -80,5 +79,3 @@ ast_node *new_ast_function_node(symrec *, ast_node *);
 ast_node *new_ast_function_def_node(symrec *, ast_node *, ast_node *);
 ast_node *new_ast_while_node(ast_node *, ast_node *);
 void free_ast_tree(ast_node *);
-
-#endif // AST_H

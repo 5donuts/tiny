@@ -1,5 +1,4 @@
-#ifndef SYMTAB_H
-#define SYMTAB_H
+#pragma once
 
 // defines valid types for symbols in the symbol table
 typedef enum { VAR, FUNC } symtype;
@@ -26,5 +25,3 @@ typedef struct symrec {
 symrec *lookup(char *);
 func_arglist *make_empty_arglist();
 void free_table();
-
-#endif // SYMTAB_H
