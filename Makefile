@@ -1,7 +1,12 @@
+SOURCES = lex.yy.c parser.tab.c symtab.c ast.c main.c
+
 All: tiny
 
+debug: main.c lexer parser
+	gcc $(SOURCES) -g -o tiny -Wall
+
 tiny: main.c lexer parser
-	gcc lex.yy.c parser.tab.c symtab.c codegen.c main.c -o tiny -Wall
+	gcc $(SOURCES) -o tiny -Wall
 
 lexer: lexer.l
 	flex lexer.l
