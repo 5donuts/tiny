@@ -11,7 +11,7 @@
 #define FUNCTION_NODE 'F'
 #define FUNCTION_DEF_NODE 'D'
 #define LIST_NODE 'L'
-// #define RETURN_NODE 'R'
+// #define RETURN_NODE 'R' // TODO figure out how to do return
 #define WHILE_NODE 'W'
 #define ADD_NODE '+'
 #define SUB_NODE '-'
@@ -20,7 +20,7 @@
 #define MOD_NODE '%'
 #define UMINUS_NODE '_' /* unary negation */
 #define BNEG_NODE '~'   /* bitwise negation */
-// #define LNEG_NODE '!'   /* logical negation */
+#define LNEG_NODE '!'   /* logical negation */
 
 // node for binary/unary operators & expression lists
 typedef struct ast_node {
@@ -79,3 +79,4 @@ ast_node *new_ast_function_node(symrec *, ast_node *);
 ast_node *new_ast_function_def_node(symrec *, ast_node *, ast_node *);
 ast_node *new_ast_while_node(ast_node *, ast_node *);
 void free_ast_tree(ast_node *);
+void traverse_tree(ast_node *);

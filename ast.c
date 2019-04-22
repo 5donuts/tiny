@@ -1,8 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "ast.h"
+
+// local function prototypes
+static bool is_leaf(ast_node *node);
 
 ast_node *ast_root; // root of the AST
 
@@ -142,4 +146,89 @@ void free_ast_tree(ast_node *tree) {
   }
 
   free(tree);
+}
+
+// recursively perform a DFS traversal of the AST
+// NB: this produces the intermediate representation of the program
+void traverse_tree(ast_node *tree) {
+  if (!tree) return; // handle NULL pointers
+
+  // evaluate leaf nodes
+  if (is_leaf(tree)) {
+    if (tree->node_type == SYMBOL_REFERENCE_NODE) {
+      // TODO resolve the symbol
+    }
+    else if (tree->node_type == NUMBER_NODE) {
+      // TODO process the constant
+    }
+  }
+
+  // process non-leaf nodes
+  else {
+    switch (tree->node_type) {
+      case ASSIGNMENT_NODE:
+        // TODO evaluate value & store it in symbol
+        break;
+
+      case FUNCTION_NODE:
+        // TODO make a function call with appropriate args
+        break;
+
+      case FUNCTION_DEF_NODE:
+        // TODO build a function and add it to the placeholder list
+        break;
+
+      case WHILE_NODE:
+        // TODO build the loop
+        break;
+
+      // TODO evaluate unary operator nodes
+      case UMINUS_NODE:
+      case BNEG_NODE:
+      case LNEG_NODE: break;
+
+      // TODO evaluate binary operator nodes
+      case ADD_NODE:
+      case SUB_NODE:
+      case MUL_NODE:
+      case DIV_NODE:
+      case MOD_NODE: break;
+    }
+  }
+}
+
+// determine if a node in the AST is a leaf node
+static bool is_leaf(ast_node *node) {
+  if (!node) return false; // handle NULL pointers
+
+  switch (node->node_type) {
+    // no child nodes (i.e., leaf)
+    case SYMBOL_REFERENCE_NODE:
+    case NUMBER_NODE:
+      return true;
+
+    // one child node
+    case ASSIGNMENT_NODE:
+    case UMINUS_NODE:
+    case BNEG_NODE:
+    case LNEG_NODE:
+      // fall through to two-child node cases
+
+    // two child nodes
+    case FUNCTION_NODE:
+    case FUNCTION_DEF_NODE:
+    case WHILE_NODE:
+    case LIST_NODE:
+    case ADD_NODE:
+    case SUB_NODE:
+    case MUL_NODE:
+    case DIV_NODE:
+    case MOD_NODE:
+      return false;
+
+    default:
+      fprintf(stderr, "Error processing node of invalid type: %c\n",
+              node->node_type);
+      return false;
+  }
 }
