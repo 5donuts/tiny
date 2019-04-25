@@ -25,6 +25,13 @@ reg *get_free_register() {
   return NULL;
 }
 
+// mark a register as free & clear its contents
+void mark_free(reg *r) {
+  r->data.lit = 0;
+  r->in_use = false;
+  r->is_lit = false;
+}
+
 // initialize the linked-list of registers
 void init_registers() {
   // build each register & add it to the list
@@ -34,6 +41,12 @@ void init_registers() {
     r->in_use = r->is_lit = false;
     put(r);
   }
+
+  // flag esp and ebp as in-use
+  reg *r = get("%%esp");
+  r->in_use = r->is_lit = true;
+  r = get("%%ebp");
+  r->in_use = r->is_lit = true;
 }
 
 // free all registers in the linked list
@@ -51,7 +64,7 @@ static void put(reg *reg) {
   head = reg;
 }
 
-// get a register from the list
+// get a specific register from the list
 static reg *get(char *name) {
   for (reg *r = head; r != NULL; r = r->next) {
     if (strcmp(r->name, name) == 0)
