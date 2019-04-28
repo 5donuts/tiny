@@ -162,7 +162,7 @@ static bool check_syscall(ast_function_node *node) {
       case SYMBOL_REFERENCE_NODE:
         {
           // get location for symbol
-          symrec *sym = (ast_symbol_reference_node *) arg;
+          symrec *sym = ((ast_symbol_reference_node *) arg)->symbol;
           reg *r = get_sym_reg(sym);
           if (r == get_reg(EBX))
             break; // the argument is already in the correct register
@@ -178,13 +178,13 @@ static bool check_syscall(ast_function_node *node) {
           // move number into %ebx
           ast_number_node *num_node = (ast_number_node *) arg;
           char str[11 + NUM_HEX_DIGITS(num_node->value)];
-          sprintf(str, "movl\t$%#x\t%s", num_node->value, EBX);
+          sprintf(str, "movl\t$%#lx\t%s", num_node->value, EBX);
           make_line(str, CUR_SEC);
         }
         break;
       default:
-        fprintf("Error making sys_exit call with argument node of type %c\n",
-                arg->node_type);
+        fprintf(stderr, "Error making sys_exit call with argument node of type"
+                        "%c\n", arg->node_type);
         break;
     }
     // specify a call to sys_exit

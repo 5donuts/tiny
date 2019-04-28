@@ -12,7 +12,7 @@ static void put(reg *);
 static reg *head; // beginning of the list
 
 // names of registers that can be used by tiny
-static const char reg_names[] = { EAX, EBX, ECX, EDX, ESP, EBP, ESI, EDI };
+static char *reg_names[] = { EAX, EBX, ECX, EDX, ESP, EBP, ESI, EDI };
 
 // get a free register or NULL
 reg *get_free_register() {

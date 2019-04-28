@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "ast.h"
+#include "codegen.h"
 
 // local function prototypes
 static bool is_leaf(ast_node *node);
@@ -157,18 +158,15 @@ void traverse_tree(ast_node *tree) {
   // process non-leaf nodes
   switch (tree->node_type) {
     case ASSIGNMENT_NODE:
-      {
-        ast_assignment_node *node = (ast_assignment_node *) tree;
-        make_assignment(node);
-      }
+      make_assignment((ast_assignment_node *) tree);
       break;
 
     case FUNCTION_NODE:
-      make_function_call(tree);
+      make_function_call((ast_function_node *) tree);
       break;
 
     case FUNCTION_DEF_NODE:
-      make_function(tree);
+      make_function((ast_function_def_node *) tree);
       break;
 
     case WHILE_NODE:
