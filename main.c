@@ -4,6 +4,8 @@
 
 #include "symtab.h" // symbol table definitions & function prototypes
 #include "ast.h"  // AST definitions & function prototypes
+#include "registers.h" // CPU register representation
+#include "codegen.h" // code generation routines
 
 extern FILE *yyin; // defined by lexer
 extern ast_node *ast_root; // defined in ast.c
@@ -19,6 +21,7 @@ FILE *out;
 
 int main(int argc, char **argv) {
   ++argv, --argc; // skip over program name
+
   // either open file specified by command-line argument
   // or read from standard input
   if (argc > 0)
@@ -32,17 +35,25 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  // TODO open file for writing output
-  // out = fopen("out.s", "wb");
+  // either write to "out.s" or file specified by command-line argument
+  if (argc > 1)
+    out = fopen(argv[1], "wb");
+  else
+    out = fopen("out.s", "wb");
 
-  // TODO traverse the AST to produce initial output w/placeholders
-  // TODO substitute placeholders in the output file
+  // traverse the AST and produce assembly
+  init_asm();
+  traverse_tree(ast_root);
+  write_asm();
 
   // cleanup & exit
-  // TODO fclose(out);
   if (argc > 0)
     fclose(yyin);
+  fclose(out);
+  free_asm();
+  free_registers();
   free_ast_tree(ast_root);
   free_table();
+
   return 0;
 }
