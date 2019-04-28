@@ -30,6 +30,6 @@ typedef struct reg {
 reg *get_free_register();
 reg *get_sym_reg(symrec *);
 reg *get_reg(char *);
-void mark_free(reg *);
+void free_reg(reg *, bool);
 void init_registers();
 void free_registers();
