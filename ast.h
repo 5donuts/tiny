@@ -58,7 +58,7 @@ typedef struct ast_function_node {
 // node to represent a function definition
 typedef struct ast_function_def_node {
   char node_type;
-  ast_node *arguments; // TODO capture these in symrec arglist??
+  ast_node *arguments; // NB: for now, don't support functions with arguments
   ast_node *body;
   symrec *symbol;
 } ast_function_def_node;
