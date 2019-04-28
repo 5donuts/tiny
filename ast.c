@@ -149,51 +149,47 @@ void free_ast_tree(ast_node *tree) {
 }
 
 // recursively perform a DFS traversal of the AST
-// NB: this produces the intermediate representation of the program
+// NB: as each node is 'evaluated', the target program is produced
 void traverse_tree(ast_node *tree) {
   if (!tree) return; // handle NULL pointers
-
-  // evaluate leaf nodes
-  if (is_leaf(tree)) {
-    if (tree->node_type == SYMBOL_REFERENCE_NODE) {
-      // TODO resolve the symbol
-    }
-    else if (tree->node_type == NUMBER_NODE) {
-      // TODO process the constant
-    }
-  }
+  if (is_leaf(tree)) return; // leaf nodes are evaluated with their parents
 
   // process non-leaf nodes
-  else {
-    switch (tree->node_type) {
-      case ASSIGNMENT_NODE:
-        // TODO evaluate value & store it in symbol
-        break;
+  switch (tree->node_type) {
+    case ASSIGNMENT_NODE:
+      {
+        ast_assignment_node *node = (ast_assignment_node *) tree;
+        make_assignment(node);
+      }
+      break;
 
-      case FUNCTION_NODE:
-        // TODO make a function call with appropriate args
-        break;
+    case FUNCTION_NODE:
+      make_function_call(tree);
+      break;
 
-      case FUNCTION_DEF_NODE:
-        // TODO build a function and add it to the placeholder list
-        break;
+    case FUNCTION_DEF_NODE:
+      make_function(tree);
+      break;
 
-      case WHILE_NODE:
-        // TODO build the loop
-        break;
+    case WHILE_NODE:
+      // TODO build a while-loop
+      break;
 
-      // TODO evaluate unary operator nodes
-      case UMINUS_NODE:
-      case BNEG_NODE:
-      case LNEG_NODE: break;
+    // evaluate unary operator nodes
+    case UMINUS_NODE:
+    case BNEG_NODE:
+    case LNEG_NODE:
+      make_unary_op(tree);
+      break;
 
-      // TODO evaluate binary operator nodes
-      case ADD_NODE:
-      case SUB_NODE:
-      case MUL_NODE:
-      case DIV_NODE:
-      case MOD_NODE: break;
-    }
+    // evaluate binary operator nodes
+    case ADD_NODE:
+    case SUB_NODE:
+    case MUL_NODE:
+    case DIV_NODE:
+    case MOD_NODE:
+      make_binary_op(tree);
+      break;
   }
 }
 
