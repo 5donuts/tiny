@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 
   // build the AST
   if (yyparse() != 0) {
-    printf("\nEncountered an error while building AST\n");
+    fprintf(stderr, "\nEncountered an error while building AST\n");
     exit(1);
   }
 
