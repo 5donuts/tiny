@@ -50,14 +50,14 @@ typedef struct ast_number_node {
 
 // node to represent a function call
 typedef struct ast_function_node {
-  int node_type;
+  char node_type;
   ast_node *arguments;
   symrec *symbol;
 } ast_function_node;
 
 // node to represent a function definition
 typedef struct ast_function_def_node {
-  int node_type;
+  char node_type;
   ast_node *arguments; // TODO capture these in symrec arglist??
   ast_node *body;
   symrec *symbol;
@@ -65,7 +65,7 @@ typedef struct ast_function_def_node {
 
 // node to represent a while-loop
 typedef struct ast_while_node {
-  int node_type;
+  char node_type;
   ast_node *condition;
   ast_node *while_branch;
 } ast_while_node;
