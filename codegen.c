@@ -30,9 +30,19 @@ static bool check_syscall(ast_function_node *);
 // evaluate a function definition node
 void make_function(ast_function_def_node *node) {
   // make a section for the function
-  char str[strlen(node->symbol->name) + 2];
-  sprintf(str, "_%s", node->symbol->name);
+  char *str;
+  if (strcmp(node->symbol->name, "main") == 0) {
+    str = (char *) malloc(6);
+    memset(str, '\0', 6);
+    sprintf(str, "%s", "_start"); // specify the program entry point
+  }
+  else {
+    str = (char *) malloc(strlen(node->symbol->name) + 2);
+    memset(str, '\0', strlen(node->symbol->name) + 2);
+    sprintf(str, "%s:", node->symbol->name);
+  }
   make_sec(str);
+  free(str);
 
   // TODO evaluate argument nodes? Not sure how I want to implement these yet
 
@@ -60,16 +70,24 @@ void make_assignment(ast_assignment_node *node) {
   // TODO implement this
 }
 
-// setup the .text section & get ready for building sections & lines
+// set up for arranging strings of assembly code in memory
 void init_asm() {
-  text_sec = make_sec(".text");
+  // create the .text section
+  asm_sec *sec = (asm_sec *) malloc(sizeof(asm_sec));
+  memset(sec, 0, sizeof(asm_sec));
+  sec->name = (char *) malloc(6);
+  strcpy(sec->name, ".text");
+
+  // set up pointers
+  text_sec = head = tail = sec;
+  num_secs++;
 }
 
 // write assembly to the output file
 void write_asm() {
   for (asm_sec *s = head; s != NULL; s = s->next) {
-    // write label for the section
-    fprintf(out, "%s:\n", s->name);
+    // write label for the section (.text section doesn't need ':' after label)
+    fprintf(out, s == text_sec ? "%s\n" : "%s:\n", s->name);
 
     // write each line in the section
     for (asm_line *l = s->first; l != NULL; l = l->next)
@@ -168,8 +186,8 @@ static bool check_syscall(ast_function_node *node) {
             break; // the argument is already in the correct register
 
           // move argument to %ebx
-          char str[14];
-          sprintf(str, "movl\t%s\t%s", r->name, EBX);
+          char str[15];
+          sprintf(str, "movl\t%s,\t%s", r->name, EBX);
           make_line(str, CUR_SEC);
         }
         break;
@@ -177,8 +195,8 @@ static bool check_syscall(ast_function_node *node) {
         {
           // move number into %ebx
           ast_number_node *num_node = (ast_number_node *) arg;
-          char str[11 + NUM_HEX_DIGITS(num_node->value)];
-          sprintf(str, "movl\t$%#lx\t%s", num_node->value, EBX);
+          char str[12 + NUM_HEX_DIGITS(num_node->value)];
+          sprintf(str, "movl\t$%#lx,\t%s", num_node->value, EBX);
           make_line(str, CUR_SEC);
         }
         break;
@@ -188,8 +206,8 @@ static bool check_syscall(ast_function_node *node) {
         break;
     }
     // specify a call to sys_exit
-    char str[11 + NUM_HEX_DIGITS(SYS_EXIT)];
-    sprintf(str, "movl\t$%#x\t%s", SYS_EXIT, EAX);
+    char str[12 + NUM_HEX_DIGITS(SYS_EXIT)];
+    sprintf(str, "movl\t$%#x,\t%s", SYS_EXIT, EAX);
     make_line(str, CUR_SEC);
     is_syscall = true;
   }
