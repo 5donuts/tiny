@@ -8,13 +8,11 @@
 
 // local function prototypes
 static void put(reg *);
-static reg *get(char *);
 
 static reg *head; // beginning of the list
 
 // names of registers that can be used by tiny
-static const char reg_names[] = { "%%eax", "%%ebx", "%%ecx", "%%edx", "%%esp",
-                                  "%%ebp", "%%esi", "%%edi" };
+static const char reg_names[] = { EAX, EBX, ECX, EDX, ESP, EBP, ESI, EDI };
 
 // get a free register or NULL
 reg *get_free_register() {
@@ -25,8 +23,33 @@ reg *get_free_register() {
   return NULL;
 }
 
-// mark a register as free & clear its contents
-void mark_free(reg *r) {
+// get the register containing sym or NULL
+reg *get_sym_reg(symrec *sym) {
+  for (reg *r = head; r != NULL; r = r->next) {
+    if (r->in_use && !r->is_lit) {
+      if (sym == r->data.sym)
+        return r; // if the pointers are the same, it's the same symbol
+    }
+  }
+  return NULL;
+}
+
+// get a specific register from the list or NULL
+reg *get_reg(char *name) {
+  for (reg *r = head; r != NULL; r = r->next) {
+    if (strcmp(r->name, name) == 0)
+      return r;
+  }
+  return NULL;
+}
+
+// free a register, and store it's value if specified
+void free_reg(reg *r, bool store_val) {
+  if (store_val) {
+    // TODO store the value somewhere
+  }
+
+  // clear the register's contents & mark it free
   r->data.lit = 0;
   r->in_use = false;
   r->is_lit = false;
@@ -34,7 +57,7 @@ void mark_free(reg *r) {
 
 // initialize the linked-list of registers
 void init_registers() {
-  // build each register & add it to the list
+  // build each register struct & add it to the list
   for (int i = 0; i < NUM_REGS; ++i) {
     reg *r = malloc(sizeof(reg));
     r->name = reg_names[i];
@@ -43,9 +66,9 @@ void init_registers() {
   }
 
   // flag esp and ebp as in-use
-  reg *r = get("%%esp");
+  reg *r = get_reg(ESP);
   r->in_use = r->is_lit = true;
-  r = get("%%ebp");
+  r = get_reg(EBP);
   r->in_use = r->is_lit = true;
 }
 
@@ -62,13 +85,4 @@ void free_registers() {
 static void put(reg *reg) {
   reg->next = head;
   head = reg;
-}
-
-// get a specific register from the list
-static reg *get(char *name) {
-  for (reg *r = head; r != NULL; r = r->next) {
-    if (strcmp(r->name, name) == 0)
-      return r;
-  }
-  return NULL;
 }
