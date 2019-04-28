@@ -3,6 +3,10 @@ CFLAGS = -Wall -lm
 
 All: tiny
 
+debug: main.c lexer parser
+	gcc $(SOURCES) $(CFLAGS) -g -o tiny
+	gdb ./tiny
+
 tiny: main.c lexer parser
 	gcc $(SOURCES) $(CFLAGS) -o tiny
 
