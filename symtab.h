@@ -23,5 +23,5 @@ typedef struct symrec {
 
 // function prototypes
 symrec *lookup(char *);
-func_arglist *make_empty_arglist();
+func_arglist *make_empty_arglist(); // TODO remove this
 void free_table();

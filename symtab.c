@@ -37,6 +37,7 @@ symrec *lookup(char *name) {
 }
 
 // build an empty argument list
+// TODO remove this
 func_arglist *make_empty_arglist() {
   func_arglist *list = malloc(sizeof(func_arglist));
   memset(list, 0, sizeof(func_arglist));
