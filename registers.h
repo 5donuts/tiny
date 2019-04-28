@@ -4,6 +4,16 @@
 
 #include "symtab.h"
 
+// register names
+#define EAX "%eax"
+#define EBX "%ebx"
+#define ECX "%ecx"
+#define EDX "%edx"
+#define ESP "%esp"
+#define EBP "%ebp"
+#define ESI "%esi"
+#define EDI "%edi"
+
 // representation of a CPU register
 typedef struct reg {
   char *name; // name of the register (e.g., "%%eax")
@@ -18,6 +28,8 @@ typedef struct reg {
 
 // function prototypes
 reg *get_free_register();
+reg *get_sym_reg(symrec *);
+reg *get_reg(char *);
 void mark_free(reg *);
 void init_registers();
 void free_registers();
