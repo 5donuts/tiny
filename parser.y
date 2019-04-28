@@ -24,7 +24,7 @@
   long num;                 /* constant integer value */
   struct ast_node *ast;     /* a node in the AST for non-terminal symbols */
   struct symrec *symbol;    /* a record in the symbol table for an identifier */
-  enum type val_type;           /* a function return type or variable type */
+  enum type val_type;       /* a function return type or variable type */
 }
 
 /* token declarations */
@@ -35,7 +35,7 @@
 %token <val_type> TYPE
 %token RETURN WHILE END
 
-/* precedence declarations */
+/* precedence declarations, lower is higher */
 %left ','
 %right '='
 %left '+' '-'
@@ -62,9 +62,9 @@ function_list
 function
   : TYPE IDENTIFIER '(' ')' '{' statement_list '}'
     {
-      $2->ret_type = $1;
+      /* $2->ret_type = $1; */
       $2->type = FUNC;
-      $2->arglist = make_empty_arglist();
+      $2->arglist = NULL; /* TODO find other calls to make_empty_arglist() & remove */
       ast_root = new_ast_function_def_node($2, NULL, $6);
     }
   ;
