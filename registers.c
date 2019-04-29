@@ -9,7 +9,8 @@
 // local function prototypes
 static void put(reg *);
 
-static reg *head; // beginning of the list
+static reg *head, // beginning of linked list
+           *curr; // most recently updated register
 
 // names of registers that can be used by tiny
 static char *reg_names[] = { EAX, EBX, ECX, EDX, ESP, EBP, ESI, EDI };
@@ -27,7 +28,7 @@ reg *get_free_register() {
 reg *get_sym_reg(symrec *sym) {
   for (reg *r = head; r != NULL; r = r->next) {
     if (r->in_use && !r->is_lit) {
-      if (sym == r->data.sym)
+      if (sym == r->sym)
         return r; // if the pointers are the same, it's the same symbol
     }
   }
@@ -43,6 +44,11 @@ reg *get_reg(char *name) {
   return NULL;
 }
 
+// get the register most recently filled with some value
+reg *get_curr() {
+  return curr;
+}
+
 // free a register, and store it's value if specified
 void free_reg(reg *r, bool store_val) {
   if (store_val) {
@@ -50,7 +56,7 @@ void free_reg(reg *r, bool store_val) {
   }
 
   // clear the register's contents & mark it free
-  r->data.lit = 0;
+  r->sym = NULL;
   r->in_use = false;
   r->is_lit = false;
 }
