@@ -31,8 +31,6 @@ typedef struct reg {
 reg *get_free_register();
 reg *get_sym_reg(symrec *);
 reg *get_reg(char *);
-void put_val(long int);
-void put_sym(symrec *, long int);
-void free_reg(reg *, bool);
+void free_reg(reg *, bool); // TODO implement some sort of make_free_reg(bool)?
 void init_registers();
 void free_registers();
