@@ -1,6 +1,7 @@
 #pragma once
 
 #include "symtab.h"
+#include "registers.h"
 
 // NB: see https://efxa.org/2014/05/25/how-to-create-an-abstract-syntax-tree-while-parsing-an-input-stream/
 
@@ -11,7 +12,7 @@
 #define FUNCTION_NODE 'F'
 #define FUNCTION_DEF_NODE 'D'
 #define LIST_NODE 'L'
-// #define RETURN_NODE 'R' // TODO figure out how to do return
+// #define RETURN_NODE 'R' // TODO figure out how to do return (as a "syscall"?)
 #define WHILE_NODE 'W'
 #define ADD_NODE '+'
 #define SUB_NODE '-'
@@ -25,6 +26,7 @@
 // node for binary/unary operators & expression lists
 typedef struct ast_node {
   char node_type;
+  reg *res; // stores result of node evaluation (where applicable)
   struct ast_node *left;
   struct ast_node *right;
 } ast_node;
@@ -32,12 +34,14 @@ typedef struct ast_node {
 // node for symbol references
 typedef struct ast_symbol_reference_node {
   char node_type;
+  reg *res;
   symrec *symbol;
 } ast_symbol_reference_node;
 
 // node for assignment statements
 typedef struct ast_assignment_node {
   char node_type;
+  reg *res;
   symrec *symbol;
   ast_node *value;
 } ast_assignment_node;
@@ -45,12 +49,14 @@ typedef struct ast_assignment_node {
 // node to represent constants
 typedef struct ast_number_node {
   char node_type;
+  reg *res;
   long int value;
 } ast_number_node;
 
 // node to represent a function call
 typedef struct ast_function_node {
   char node_type;
+  reg *res;
   ast_node *arguments;
   symrec *symbol;
 } ast_function_node;
