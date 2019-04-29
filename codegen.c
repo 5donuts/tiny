@@ -11,12 +11,17 @@
 // NB: this includes the "0x" prefix; subtract 2 if you don't want that
 #define NUM_HEX_DIGITS(n) ((int) (floor((log10(n) / log10(16)) + 3)))
 
+// determine number of digits in a decimal number
+#define NUM_DIGITS(n) ((int) (floor(log10(n) + 1)))
+
+// keeps track of how many labels there are; it's used to make label names
+static int num_labels = 0;
+
 extern FILE *out; // defined in main.c
 
 // pointers for asm linked list
 // NB: the list is FIFO
 static asm_sec *head, *tail, *text_sec;
-static int num_secs = 0;
 
 // TODO always use tail as current section?
 #define CUR_SEC tail
@@ -26,6 +31,7 @@ static asm_sec *get_sec(char *);
 static asm_sec *make_sec(char *);
 static void make_line(char *, asm_sec *);
 static bool check_syscall(ast_function_node *);
+static char *make_label();
 
 // evaluate a function definition node
 void make_function(ast_function_def_node *node) {
@@ -37,29 +43,75 @@ void make_function(ast_function_def_node *node) {
     sprintf(str, "%s", "_start"); // specify the program entry point
   }
   else {
-    str = (char *) malloc(strlen(node->symbol->name) + 2);
-    memset(str, '\0', strlen(node->symbol->name) + 2);
-    sprintf(str, "%s:", node->symbol->name);
+    str = (char *) malloc(strlen(node->symbol->name) + 1);
+    memset(str, '\0', strlen(node->symbol->name) + 1);
+    sprintf(str, "%s", node->symbol->name);
   }
   make_sec(str);
   free(str);
 
   // TODO evaluate argument nodes? Not sure how I want to implement these yet
-
-  // evaluate child nodes to produce function body
-  traverse_tree(node->body);
 }
 
 // evaluate a function call node
 void make_function_call(ast_function_node *node) {
   if (check_syscall(node)) return; // process system calls
 
+  // TODO implement return as a function call?
+
   // TODO be able to call other functions
 }
 
 // evaluate sub-expression and apply the unary operator to it
 void make_unary_op(ast_node *node) {
-  // evaluate sub-expression
+  // get the register containing the evaluation of the node
+  reg *loc = node->res;
+
+  // apply the unary operator
+  char str[8];
+  switch(node->node_type) {
+    case UMINUS_NODE:
+      sprintf(str, "neg\t%s", loc->name);
+      make_line(str, CUR_SEC);
+      break;
+
+    case BNEG_NODE:
+      sprintf(str, "not\t%s", loc->name);
+      make_line(str, CUR_SEC);
+      break;
+
+    case LNEG_NODE:
+      {
+        // get labels for jmp instructions
+        char *ne = make_label(), *skip = make_label();
+        // make the logical negation (see logical_neg.s template for details)
+        char str[14];
+        sprintf(str, "cmp\t$1,\t%s", loc->name);
+        // TODO find out how to send make_line formatted strings
+        make_line(str, CUR_SEC);
+        sprintf(str, "jne\t%s", ne);
+        make_line(str, CUR_SEC);
+        sprintf(str, "\tmovl\t$0,\t%s", loc->name);
+        make_line(str, CUR_SEC);
+        sprintf(str, "\tjmp\t%s", skip);
+        make_line(str, CUR_SEC);
+        sprintf(str, "%s:", ne);
+        make_line(str, CUR_SEC);
+        sprintf(str, "\tmovl\t$1,\t%s", loc->name);
+        make_line(str, CUR_SEC);
+        sprintf(str, "%s:", skip);
+        make_line(str, CUR_SEC);
+      }
+      break;
+
+    default:
+      fprintf(stderr, "Error applying unary operator of type %c\n",
+              node->node_type);
+      break;
+  }
+
+  // indicate where the result was stored
+  node->res = loc;
 }
 
 void make_binary_op(ast_node *node) {
@@ -67,7 +119,43 @@ void make_binary_op(ast_node *node) {
 }
 
 void make_assignment(ast_assignment_node *node) {
-  // TODO implement this
+  // get the location the symbol is stored in
+  reg *loc = get_sym_reg(node->symbol);
+  if (loc == NULL) {
+    // the symbol hasn't been initialized before
+    loc = get_free_register(); // TODO handle no free registers
+  }
+
+  // move the value into the symbol's storage location
+  reg *val = node->value->res;
+  char str[15];
+  sprintf(str, "movl\t%s,\t%s", val->name, loc->name);
+  make_line(str, CUR_SEC);
+}
+
+void eval_leaf(ast_node *leaf) {
+  if (leaf->node_type == NUMBER_NODE) {
+    ast_number_node *node = (ast_number_node *) leaf;
+
+    // move the literal into a register
+    reg *r = get_free_register(); // TODO handle NULL (no free registers)
+    r->in_use = r->is_lit = true;
+    char str[NUM_HEX_DIGITS(node->value) + 13];
+    sprintf(str, "movl\t$%#lx,\t%s", node->value, r->name);
+    make_line(str, CUR_SEC);
+
+    // store the location of the evaluation of this node
+    leaf->res = r;
+  }
+  else if (leaf->node_type == SYMBOL_REFERENCE_NODE) {
+    // determine where the value of the symbol is
+    ast_symbol_reference_node *node = (ast_symbol_reference_node *) leaf;
+    reg *r = get_sym_reg(node->symbol); // TODO handle NULL (no symbol register)
+
+    // store the location of the evaluation of this node
+    leaf->res = r;
+  }
+  else return; // do not process other nodes
 }
 
 // set up for arranging strings of assembly code in memory
@@ -80,7 +168,6 @@ void init_asm() {
 
   // set up pointers
   text_sec = head = tail = sec;
-  num_secs++;
 }
 
 // write assembly to the output file
@@ -109,7 +196,6 @@ void free_asm() {
     asm_sec *tmp = s;
     s = s->next;
     free(tmp);
-    num_secs--;
   }
 }
 
@@ -131,13 +217,8 @@ static asm_sec *make_sec(char *name) {
   strcpy(sec->name, name);
 
   // add it to the list
-  if (num_secs == 0)
-    head = tail = sec;
-  else {
-    tail->next = sec;
-    tail = sec;
-  }
-  num_secs++;
+  tail->next = sec;
+  tail = sec;
 
   // add a line for it in the .text section
   char str[strlen(name) + 8];
@@ -149,6 +230,7 @@ static asm_sec *make_sec(char *name) {
 
 // "write" a line of assembly into a particular section
 // NB: it's always added at the end of the section
+// NB: it's not necessary to add leading '\t' or trailing '\n'
 static void make_line(char *text, asm_sec *sec) {
   // make the line
   asm_line *line = (asm_line *) malloc(sizeof(asm_line));
@@ -203,6 +285,8 @@ static bool check_syscall(ast_function_node *node) {
       default:
         fprintf(stderr, "Error making sys_exit call with argument node of type"
                         "%c\n", arg->node_type);
+        // TODO support evaluation of arithmetic nodes (see node->reg for value)
+        // this will be done in ast.c (traverse_tree, FUNCTION_NODE case)
         break;
     }
     // specify a call to sys_exit
@@ -217,4 +301,11 @@ static bool check_syscall(ast_function_node *node) {
     make_line("int\t$0x80", CUR_SEC);
 
   return is_syscall;
+}
+
+// make a new label to use for jmp instructions
+static char *make_label() {
+  char *str = (char *) malloc(NUM_DIGITS(num_labels) + 2);
+  sprintf(str, "L%d", num_labels++);
+  return str;
 }
