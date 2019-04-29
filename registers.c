@@ -9,8 +9,7 @@
 // local function prototypes
 static void put(reg *);
 
-static reg *head, // beginning of linked list
-           *curr; // most recently updated register
+static reg *head; // beginning of linked list
 
 // names of registers that can be used by tiny
 static char *reg_names[] = { EAX, EBX, ECX, EDX, ESP, EBP, ESI, EDI };
@@ -42,11 +41,6 @@ reg *get_reg(char *name) {
       return r;
   }
   return NULL;
-}
-
-// get the register most recently filled with some value
-reg *get_curr() {
-  return curr;
 }
 
 // free a register, and store it's value if specified
