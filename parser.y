@@ -95,7 +95,7 @@ expression
   | expression '/' expression   { $$ = new_ast_node('/', $1, $3); }
   | expression '%' expression   { $$ = new_ast_node('%', $1, $3); }
   | NUMBER                      { $$ = new_ast_number_node($1); }
-  | TYPE IDENTIFIER             { $2->dat_type = $1;
+  | TYPE IDENTIFIER             { /* $2->dat_type = $1; */
                                   $$ = new_ast_symbol_reference_node($2);
                                 }
   | IDENTIFIER '=' expression   { $$ = new_ast_assignment_node($1, $3); }

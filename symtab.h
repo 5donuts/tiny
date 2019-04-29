@@ -15,8 +15,8 @@ typedef struct func_arglist {
 typedef struct symrec {
   char *name; // name of the symbol
   symtype type; // type of the symbol
-  enum type ret_type; // for functions
-  enum type dat_type; // for variables
+  // enum type ret_type; // for functions
+  // enum type dat_type; // for variables
   func_arglist *arglist; // argument list for functions
   struct symrec *next; // next item in the linked list
 } symrec;

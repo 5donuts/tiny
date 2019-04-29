@@ -68,8 +68,6 @@ static void del(symrec *sym) {
   // handle case of non-NULL pointer
   sym->name = next->name;
   sym->type = next->type;
-  sym->ret_type = next->ret_type;
-  sym->dat_type = next->dat_type;
   sym->arglist = next->arglist;
   sym->next = next->next;
 
