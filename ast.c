@@ -24,16 +24,6 @@ ast_node *new_ast_node(int node_type, ast_node *left, ast_node *right) {
   return node;
 }
 
-ast_node *new_ast_symbol_reference_node(symrec *symbol) {
-  ast_symbol_reference_node *node = malloc(sizeof(ast_symbol_reference_node));
-  memset(node, 0, sizeof(ast_symbol_reference_node));
-
-  node->node_type = SYMBOL_REFERENCE_NODE;
-  node->symbol = symbol;
-
-  return (ast_node *) node;
-}
-
 ast_node *new_ast_assignment_node(symrec *symbol, ast_node *value) {
   ast_assignment_node *node = malloc(sizeof(ast_assignment_node));
   memset(node, 0, sizeof(ast_assignment_node));
@@ -51,6 +41,26 @@ ast_node *new_ast_number_node(long int value) {
 
   node->node_type = NUMBER_NODE;
   node->value = value;
+
+  return (ast_node *) node;
+}
+
+ast_node *new_ast_symbol_reference_node(symrec *symbol) {
+  ast_symbol_reference_node *node = malloc(sizeof(ast_symbol_reference_node));
+  memset(node, 0, sizeof(ast_symbol_reference_node));
+
+  node->node_type = SYMBOL_REFERENCE_NODE;
+  node->symbol = symbol;
+
+  return (ast_node *) node;
+}
+
+ast_node *new_ast_symbol_declaration_node(symrec *symbol) {
+  ast_symbol_declaration_node *node = malloc(sizeof(ast_symbol_declaration_node));
+  memset(node, 0, sizeof(ast_symbol_declaration_node));
+
+  node->node_type = SYMBOL_DECLARATION_NODE;
+  node->symbol = symbol;
 
   return (ast_node *) node;
 }
@@ -114,6 +124,7 @@ void free_ast_tree(ast_node *tree) {
       // fall through to no-subtree cases
 
     // no sub-trees
+    case SYMBOL_DECLARATION_NODE:
     case SYMBOL_REFERENCE_NODE:
     case NUMBER_NODE:
       break;
@@ -153,41 +164,62 @@ void free_ast_tree(ast_node *tree) {
 // NB: as each node is 'evaluated', the target program is produced
 void traverse_tree(ast_node *tree) {
   if (!tree) return; // handle NULL pointers
-  if (is_leaf(tree)) return; // leaf nodes are evaluated with their parents
 
-  // process non-leaf nodes
-  switch (tree->node_type) {
-    case ASSIGNMENT_NODE:
-      make_assignment((ast_assignment_node *) tree);
-      break;
+  if (is_leaf(tree)) {
+    eval_leaf(tree);
+  }
+  else {
+    // process non-leaf nodes
+    switch (tree->node_type) {
+      case ASSIGNMENT_NODE:
+        {
+          ast_assignment_node *node = (ast_assignment_node *) tree;
+          traverse_tree(node->value); // evaluate the value to assign
+          make_assignment(node); // make the assignment
+        }
+        break;
 
-    case FUNCTION_NODE:
-      make_function_call((ast_function_node *) tree);
-      break;
+      case FUNCTION_NODE:
+        {
+          ast_function_node *node = (ast_function_node *) tree;
+          make_function_call(node);
+          // TODO support arguments in a function call
+        }
+        break;
 
-    case FUNCTION_DEF_NODE:
-      make_function((ast_function_def_node *) tree);
-      break;
+      case FUNCTION_DEF_NODE:
+        {
+          // make the function
+          ast_function_def_node *node = (ast_function_def_node *) tree;
+          make_function(node);
+          // traverse sub-tree to produce function body
+          traverse_tree(node->body);
+        }
+        break;
 
-    case WHILE_NODE:
-      // TODO build a while-loop
-      break;
+      case WHILE_NODE:
+        // TODO build a while-loop
+        break;
 
-    // evaluate unary operator nodes
-    case UMINUS_NODE:
-    case BNEG_NODE:
-    case LNEG_NODE:
-      make_unary_op(tree);
-      break;
+      // evaluate unary operator nodes
+      case UMINUS_NODE:
+      case BNEG_NODE:
+      case LNEG_NODE:
+        traverse_tree(tree->left); // evaluate argument
+        make_unary_op(tree); // apply operator
+        break;
 
-    // evaluate binary operator nodes
-    case ADD_NODE:
-    case SUB_NODE:
-    case MUL_NODE:
-    case DIV_NODE:
-    case MOD_NODE:
-      make_binary_op(tree);
-      break;
+      // evaluate binary operator nodes
+      case ADD_NODE:
+      case SUB_NODE:
+      case MUL_NODE:
+      case DIV_NODE:
+      case MOD_NODE:
+        traverse_tree(tree->left); // evaluate arguments
+        traverse_tree(tree->right);
+        make_binary_op(tree); // apply operator
+        break;
+    }
   }
 }
 
@@ -197,6 +229,7 @@ static bool is_leaf(ast_node *node) {
 
   switch (node->node_type) {
     // no child nodes (i.e., leaf)
+    case SYMBOL_DECLARATION_NODE:
     case SYMBOL_REFERENCE_NODE:
     case NUMBER_NODE:
       return true;

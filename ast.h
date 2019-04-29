@@ -7,6 +7,7 @@
 
 // node types
 #define SYMBOL_REFERENCE_NODE 'S'
+#define SYMBOL_DECLARATION_NODE 'Y'
 #define ASSIGNMENT_NODE 'A'
 #define NUMBER_NODE 'N'
 #define FUNCTION_NODE 'F'
@@ -31,13 +32,6 @@ typedef struct ast_node {
   struct ast_node *right;
 } ast_node;
 
-// node for symbol references
-typedef struct ast_symbol_reference_node {
-  char node_type;
-  reg *res;
-  symrec *symbol;
-} ast_symbol_reference_node;
-
 // node for assignment statements
 typedef struct ast_assignment_node {
   char node_type;
@@ -46,12 +40,25 @@ typedef struct ast_assignment_node {
   ast_node *value;
 } ast_assignment_node;
 
-// node to represent constants
+// node to represent literals
 typedef struct ast_number_node {
   char node_type;
   reg *res;
   long int value;
 } ast_number_node;
+
+// node for symbol references
+typedef struct ast_symbol_reference_node {
+  char node_type;
+  reg *res;
+  symrec *symbol;
+} ast_symbol_reference_node;
+
+// node for symbol declarations
+typedef struct ast_symbol_declaration_node {
+  char node_type;
+  symrec *symbol;
+} ast_symbol_declaration_node;
 
 // node to represent a function call
 typedef struct ast_function_node {
@@ -78,9 +85,10 @@ typedef struct ast_while_node {
 
 // function prototypes
 ast_node *new_ast_node(int, ast_node *, ast_node *);
-ast_node *new_ast_symbol_reference_node(symrec *);
 ast_node *new_ast_assignment_node(symrec *, ast_node *);
 ast_node *new_ast_number_node(long int);
+ast_node *new_ast_symbol_reference_node(symrec *);
+ast_node *new_ast_symbol_declaration_node(symrec *);
 ast_node *new_ast_function_node(symrec *, ast_node *);
 ast_node *new_ast_function_def_node(symrec *, ast_node *, ast_node *);
 ast_node *new_ast_while_node(ast_node *, ast_node *);
