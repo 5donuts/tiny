@@ -22,6 +22,7 @@ void make_function_call(ast_function_node *);
 void make_unary_op(ast_node *);
 void make_binary_op(ast_node *);
 void make_assignment(ast_assignment_node *);
+void eval_leaf(ast_node *);
 void init_asm();
 void write_asm();
 void free_asm();
