@@ -58,4 +58,3 @@ tiny
 out*
 *.output
 test_programs/
-target_templates
